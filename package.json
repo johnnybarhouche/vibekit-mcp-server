@@ -1,0 +1,45 @@
+{
+  "name": "@vibekit/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for VibeCodersKit - access your prompts from Claude Code",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "vibekit-mcp": "./dist/index.js",
+    "vck_login": "./dist/login.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "login": "node dist/login.js",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "mcp",
+    "claude",
+    "vibekit",
+    "prompts",
+    "ai"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vibecoderskit/mcp-server.git"
+  },
+  "homepage": "https://vibecoderskit.com",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
