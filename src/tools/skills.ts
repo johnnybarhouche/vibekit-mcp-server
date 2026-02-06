@@ -113,7 +113,7 @@ export async function handleSkillTool(
       const list = data.skills
         .map(
           (s) =>
-            `- **${s.name}** (${s.id})\n  ${s.description || "No description"}${s.category ? `\n  Category: ${s.category}` : ""}${s.trigger ? ` | Trigger: ${s.trigger}` : ""}`
+            `- **${s.name}** (${s.id})\n  ${s.description || "No description"}${s.category ? `\n  Category: ${s.category}` : ""}${s.trigger ? ` | Trigger: ${s.trigger}` : ""}${s.projects && s.projects.length > 0 ? `\n  Projects: ${s.projects.join(", ")}` : ""}`
         )
         .join("\n\n");
 
@@ -143,6 +143,7 @@ export async function handleSkillTool(
       if (skill.trigger) parts.push(`\n**Trigger:** ${skill.trigger}`);
       if (skill.category) parts.push(`**Category:** ${skill.category}`);
       if (skill.tags && skill.tags.length > 0) parts.push(`**Tags:** ${skill.tags.join(", ")}`);
+      if (skill.projects && skill.projects.length > 0) parts.push(`**Projects:** ${skill.projects.join(", ")}`);
       if (skill.content) parts.push(`\n## Content\n\n${skill.content}`);
       if (skill.files && Array.isArray(skill.files) && skill.files.length > 0) {
         parts.push(`\n## Files\n\n\`\`\`json\n${JSON.stringify(skill.files, null, 2)}\n\`\`\``);

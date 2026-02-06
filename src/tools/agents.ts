@@ -109,7 +109,7 @@ export async function handleAgentTool(
       const list = data.agents
         .map(
           (a) =>
-            `- **${a.name}** (${a.id})\n  ${a.description || "No description"}${a.model ? `\n  Model: ${a.model}` : ""}${a.optimized_for ? ` | ${a.optimized_for}` : ""}`
+            `- **${a.name}** (${a.id})\n  ${a.description || "No description"}${a.model ? `\n  Model: ${a.model}` : ""}${a.optimized_for ? ` | ${a.optimized_for}` : ""}${a.projects && a.projects.length > 0 ? `\n  Projects: ${a.projects.join(", ")}` : ""}`
         )
         .join("\n\n");
 
@@ -140,6 +140,7 @@ export async function handleAgentTool(
       if (agent.temperature !== null) parts.push(`**Temperature:** ${agent.temperature}`);
       if (agent.max_tokens) parts.push(`**Max tokens:** ${agent.max_tokens}`);
       if (agent.optimized_for) parts.push(`**Optimized for:** ${agent.optimized_for}`);
+      if (agent.projects && agent.projects.length > 0) parts.push(`**Projects:** ${agent.projects.join(", ")}`);
       if (agent.system_prompt) parts.push(`\n## System Prompt\n\n${agent.system_prompt}`);
       if (agent.tools && Array.isArray(agent.tools) && agent.tools.length > 0) {
         parts.push(`\n## Tools\n\n\`\`\`json\n${JSON.stringify(agent.tools, null, 2)}\n\`\`\``);

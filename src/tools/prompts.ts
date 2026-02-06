@@ -11,6 +11,7 @@ interface Prompt {
   content: string;
   category: string | null;
   tags: string[] | null;
+  projects: string[] | null;
   created_at: string;
   updated_at: string;
 }
@@ -119,7 +120,7 @@ export async function handlePromptTool(
       const list = data.prompts
         .map(
           (p) =>
-            `- **${p.name}** (${p.id})\n  ${p.description || "No description"}${p.category ? `\n  Category: ${p.category}` : ""}`
+            `- **${p.name}** (${p.id})\n  ${p.description || "No description"}${p.category ? `\n  Category: ${p.category}` : ""}${p.projects && p.projects.length > 0 ? `\n  Projects: ${p.projects.join(", ")}` : ""}`
         )
         .join("\n\n");
 

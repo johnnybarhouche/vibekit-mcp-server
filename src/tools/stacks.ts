@@ -177,7 +177,7 @@ export async function handleStackTool(
       const list = data.stacks
         .map(
           (s) =>
-            `- **${s.name}** (${s.id})\n  ${s.description || "No description"}`
+            `- **${s.name}** (${s.id})\n  ${s.description || "No description"}${s.projects && s.projects.length > 0 ? `\n  Projects: ${s.projects.join(", ")}` : ""}`
         )
         .join("\n\n");
 
@@ -234,6 +234,7 @@ export async function handleStackTool(
       parts.push(`\n## Tools\n\n${formatTechList(stack.tools)}`);
 
       if (stack.notes) parts.push(`\n## Notes\n\n${stack.notes}`);
+      if (stack.projects && stack.projects.length > 0) parts.push(`\n**Projects:** ${stack.projects.join(", ")}`);
 
       return { content: [{ type: "text", text: parts.join("\n") }] };
     }

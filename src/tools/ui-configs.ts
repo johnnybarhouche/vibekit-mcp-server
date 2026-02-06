@@ -180,7 +180,7 @@ export async function handleUIConfigTool(
       const list = data.ui_configs
         .map(
           (c) =>
-            `- **${c.name}** (${c.id})\n  ${c.description || "No description"}${c.design_system ? `\n  Design system: ${c.design_system}` : ""}${c.component_library ? ` | Components: ${c.component_library}` : ""}`
+            `- **${c.name}** (${c.id})\n  ${c.description || "No description"}${c.design_system ? `\n  Design system: ${c.design_system}` : ""}${c.component_library ? ` | Components: ${c.component_library}` : ""}${c.projects && c.projects.length > 0 ? `\n  Projects: ${c.projects.join(", ")}` : ""}`
         )
         .join("\n\n");
 
@@ -270,6 +270,7 @@ export async function handleUIConfigTool(
       if (config.custom_css) parts.push(`\n## Custom CSS\n\n\`\`\`css\n${config.custom_css}\n\`\`\``);
       if (config.notes) parts.push(`\n## Notes\n\n${config.notes}`);
       if (config.tags && config.tags.length > 0) parts.push(`\n**Tags:** ${config.tags.join(", ")}`);
+      if (config.projects && config.projects.length > 0) parts.push(`**Projects:** ${config.projects.join(", ")}`);
 
       return { content: [{ type: "text", text: parts.join("\n") }] };
     }

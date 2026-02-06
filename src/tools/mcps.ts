@@ -153,7 +153,7 @@ export async function handleMCPConfigTool(
       const list = data.mcps
         .map(
           (m) =>
-            `- **${m.name}** (${m.id})\n  ${m.description || "No description"}\n  Type: ${m.server_type}${m.command ? ` | Command: ${m.command}` : ""}${m.url ? ` | URL: ${m.url}` : ""}`
+            `- **${m.name}** (${m.id})\n  ${m.description || "No description"}\n  Type: ${m.server_type}${m.command ? ` | Command: ${m.command}` : ""}${m.url ? ` | URL: ${m.url}` : ""}${m.projects && m.projects.length > 0 ? `\n  Projects: ${m.projects.join(", ")}` : ""}`
         )
         .join("\n\n");
 
@@ -241,6 +241,8 @@ export async function handleMCPConfigTool(
 
       if (config.tags && config.tags.length > 0)
         parts.push(`\n**Tags:** ${config.tags.join(", ")}`);
+      if (config.projects && config.projects.length > 0)
+        parts.push(`**Projects:** ${config.projects.join(", ")}`);
 
       return { content: [{ type: "text", text: parts.join("\n") }] };
     }
