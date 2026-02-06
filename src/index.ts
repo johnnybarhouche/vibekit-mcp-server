@@ -23,6 +23,7 @@ import { skillToolDefinitions, handleSkillTool } from "./tools/skills.js";
 import { statusToolDefinitions, handleStatusTool } from "./tools/status.js";
 import { uiConfigToolDefinitions, handleUIConfigTool } from "./tools/ui-configs.js";
 import { stackToolDefinitions, handleStackTool } from "./tools/stacks.js";
+import { mcpConfigToolDefinitions, handleMCPConfigTool } from "./tools/mcps.js";
 
 // Types for resources
 interface Prompt {
@@ -36,7 +37,7 @@ interface Prompt {
 const server = new Server(
   {
     name: "vibekit",
-    version: "1.1.0",
+    version: "1.2.0",
   },
   {
     capabilities: {
@@ -55,6 +56,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       ...skillToolDefinitions,
       ...uiConfigToolDefinitions,
       ...stackToolDefinitions,
+      ...mcpConfigToolDefinitions,
       ...statusToolDefinitions,
     ],
   };
@@ -72,6 +74,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       (await handleSkillTool(name, args as Record<string, unknown>)) ||
       (await handleUIConfigTool(name, args as Record<string, unknown>)) ||
       (await handleStackTool(name, args as Record<string, unknown>)) ||
+      (await handleMCPConfigTool(name, args as Record<string, unknown>)) ||
       (await handleStatusTool(name, args as Record<string, unknown>));
 
     if (result) return result;
@@ -161,6 +164,7 @@ Tools: list_prompts, get_prompt, save_prompt, delete_prompt,
        list_skills, get_skill, save_skill, delete_skill,
        list_ui_configs, get_ui_config, save_ui_config, delete_ui_config,
        list_stacks, get_stack, save_stack, delete_stack,
+       list_mcp_configs, get_mcp_config, save_mcp_config, delete_mcp_config,
        vck_status, vck_logout
 `);
 } else {
