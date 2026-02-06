@@ -52,7 +52,7 @@ export function deleteToken(): void {
 }
 
 export function getApiBaseUrl(): string {
-  return process.env.VIBEKIT_API_URL || "https://vibecoderskit.com";
+  return process.env.VIBEKIT_API_URL || "https://vibecoderskit.ai";
 }
 
 export async function refreshAccessToken(token: TokenData): Promise<TokenData | null> {

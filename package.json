@@ -29,7 +29,7 @@
     "type": "git",
     "url": "https://github.com/vibecoderskit/mcp-server.git"
   },
-  "homepage": "https://vibecoderskit.com",
+  "homepage": "https://vibecoderskit.ai",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"

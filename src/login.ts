@@ -12,7 +12,7 @@ import { join } from "path";
 
 const CONFIG_DIR = join(homedir(), ".vibekit");
 const TOKEN_FILE = join(CONFIG_DIR, "token.json");
-const API_BASE_URL = process.env.VIBEKIT_API_URL || "https://vibecoderskit.com";
+const API_BASE_URL = process.env.VIBEKIT_API_URL || "https://vibecoderskit.ai";
 
 interface DeviceCodeResponse {
   device_code: string;
