@@ -13,7 +13,7 @@ Add to your Claude Code MCP settings (`.mcp.json` in your project or `~/.claude/
   "mcpServers": {
     "vibekit": {
       "command": "npx",
-      "args": ["-y", "@vibekit/mcp-server"]
+      "args": ["-y", "vibekit-mcp-server"]
     }
   }
 }
@@ -22,7 +22,7 @@ Add to your Claude Code MCP settings (`.mcp.json` in your project or `~/.claude/
 ### 2. Connect your account
 
 ```bash
-npx @vibekit/mcp-server login
+npx vibekit-mcp-server login
 ```
 
 This displays a code like `VIBE-XXXX`. Open the URL shown and enter the code to authorize.
@@ -79,7 +79,7 @@ For local development, point to your local API:
 ## Troubleshooting
 
 **"Not authenticated" error**
-Run `npx @vibekit/mcp-server login` to connect your account.
+Run `npx vibekit-mcp-server login` to connect your account.
 
 **"Authentication expired" error**
 Tokens auto-refresh. If refresh fails, run login again.

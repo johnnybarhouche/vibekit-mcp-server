@@ -1,5 +1,5 @@
 {
-  "name": "@vibekit/mcp-server",
+  "name": "vibekit-mcp-server",
   "version": "1.0.0",
   "description": "MCP server for VibeCodersKit - access your prompts from Claude Code",
   "type": "module",

@@ -625,9 +625,9 @@ if (subcommand === "login") {
 VibeCodersKit MCP Server
 
 Usage:
-  npx @vibekit/mcp-server          Start the MCP server (stdio)
-  npx @vibekit/mcp-server login    Connect your VibeCodersKit account
-  npx @vibekit/mcp-server help     Show this help message
+  npx vibekit-mcp-server          Start the MCP server (stdio)
+  npx vibekit-mcp-server login    Connect your VibeCodersKit account
+  npx vibekit-mcp-server help     Show this help message
 `);
 } else {
   startServer().catch((error) => {
