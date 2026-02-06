@@ -152,6 +152,7 @@ async function apiRequest<T>(
       throw new Error(error.error || `API error: ${retry.status}`);
     }
 
+    if (retry.status === 204) return {} as T;
     return retry.json();
   }
 
@@ -160,6 +161,7 @@ async function apiRequest<T>(
     throw new Error(error.error || `API error: ${response.status}`);
   }
 
+  if (response.status === 204) return {} as T;
   return response.json();
 }
 
