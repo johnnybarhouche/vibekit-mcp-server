@@ -13,7 +13,7 @@ import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, unlinkSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
 
@@ -172,12 +172,28 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             category: {
               type: "string",
-              description: "Category (e.g., coding, writing, analysis)",
+              enum: [
+                "Code Generation",
+                "Code Review",
+                "Documentation",
+                "Debugging",
+                "Refactoring",
+                "Testing",
+                "Explanation",
+                "Translation",
+                "Other",
+              ],
+              description: "Category for the prompt",
             },
             tags: {
               type: "array",
               items: { type: "string" },
               description: "Tags for organization",
+            },
+            projects: {
+              type: "array",
+              items: { type: "string" },
+              description: "Project names to associate with this prompt",
             },
           },
           required: ["name", "content"],
@@ -195,6 +211,30 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ["id"],
+        },
+      },
+      {
+        name: "vck_status",
+        description:
+          "Check your VibeCodersKit connection status. Shows whether you're logged in, your account info, and token expiry.",
+        inputSchema: {
+          type: "object",
+          properties: {},
+        },
+      },
+      {
+        name: "vck_logout",
+        description:
+          "Disconnect your VibeCodersKit account. Removes stored credentials and optionally revokes the token server-side.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            revoke: {
+              type: "boolean",
+              description:
+                "Also revoke the token server-side (default: true)",
+            },
+          },
         },
       },
     ],
@@ -310,6 +350,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             description: args.description,
             category: args.category,
             tags: args.tags,
+            projects: args.projects,
           }),
         });
 
@@ -344,6 +385,93 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             {
               type: "text",
               text: `Deleted prompt ${args.id}`,
+            },
+          ],
+        };
+      }
+
+      case "vck_status": {
+        const token = loadToken();
+
+        if (!token) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: "Not connected. Run vck_login to connect your VibeCodersKit account.",
+              },
+            ],
+          };
+        }
+
+        const expiresAt = new Date(token.expires_at);
+        const isExpired = expiresAt < new Date();
+        const expiresIn = Math.round(
+          (expiresAt.getTime() - Date.now()) / 1000 / 60
+        );
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: [
+                `Connected to VibeCodersKit`,
+                ``,
+                `  Account: ${token.user.name} (${token.user.email})`,
+                `  Token:   ${isExpired ? "EXPIRED" : `valid for ${expiresIn} minutes`}`,
+                isExpired
+                  ? `\nYour token has expired. Run vck_login to reconnect.`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join("\n"),
+            },
+          ],
+        };
+      }
+
+      case "vck_logout": {
+        const token = loadToken();
+
+        if (!token) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: "Already disconnected — no stored credentials found.",
+              },
+            ],
+          };
+        }
+
+        // Revoke server-side unless explicitly opted out
+        const shouldRevoke = args?.revoke !== false;
+        if (shouldRevoke) {
+          try {
+            await fetch(`${API_BASE_URL}/api/mcp/auth/revoke`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token.access_token}`,
+              },
+            });
+          } catch {
+            // Best-effort revocation — still delete local file
+          }
+        }
+
+        // Delete local token file
+        try {
+          unlinkSync(TOKEN_FILE);
+        } catch {
+          // File may already be gone
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Disconnected ${token.user.email} from VibeCodersKit.${shouldRevoke ? " Token revoked server-side." : ""}`,
             },
           ],
         };
