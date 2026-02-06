@@ -1,11 +1,11 @@
 {
-  "name": "vibekit-mcp-server",
+  "name": "vibecoderskit-mcp-server",
   "version": "1.2.0",
   "description": "MCP server for VibeCodersKit - access your prompts, agents, skills, UI configs, tech stacks, and MCP configs from Claude Code",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "vibekit-mcp": "./dist/index.js"
+    "vibecoderskit-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -21,9 +21,12 @@
   "keywords": [
     "mcp",
     "claude",
-    "vibekit",
+    "vibecoderskit",
     "prompts",
-    "ai"
+    "agents",
+    "skills",
+    "ai",
+    "model-context-protocol"
   ],
   "repository": {
     "type": "git",
