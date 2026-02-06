@@ -21,6 +21,8 @@ import { promptToolDefinitions, handlePromptTool } from "./tools/prompts.js";
 import { agentToolDefinitions, handleAgentTool } from "./tools/agents.js";
 import { skillToolDefinitions, handleSkillTool } from "./tools/skills.js";
 import { statusToolDefinitions, handleStatusTool } from "./tools/status.js";
+import { uiConfigToolDefinitions, handleUIConfigTool } from "./tools/ui-configs.js";
+import { stackToolDefinitions, handleStackTool } from "./tools/stacks.js";
 
 // Types for resources
 interface Prompt {
@@ -51,6 +53,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       ...promptToolDefinitions,
       ...agentToolDefinitions,
       ...skillToolDefinitions,
+      ...uiConfigToolDefinitions,
+      ...stackToolDefinitions,
       ...statusToolDefinitions,
     ],
   };
@@ -66,6 +70,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       (await handlePromptTool(name, args as Record<string, unknown>)) ||
       (await handleAgentTool(name, args as Record<string, unknown>)) ||
       (await handleSkillTool(name, args as Record<string, unknown>)) ||
+      (await handleUIConfigTool(name, args as Record<string, unknown>)) ||
+      (await handleStackTool(name, args as Record<string, unknown>)) ||
       (await handleStatusTool(name, args as Record<string, unknown>));
 
     if (result) return result;
@@ -133,7 +139,7 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
 async function startServer() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("VibeCodersKit MCP server running (v1.1.0)");
+  console.error("VibeCodersKit MCP server running (v1.2.0)");
 }
 
 // CLI subcommand routing
@@ -153,6 +159,8 @@ Usage:
 Tools: list_prompts, get_prompt, save_prompt, delete_prompt,
        list_agents, get_agent, save_agent, delete_agent,
        list_skills, get_skill, save_skill, delete_skill,
+       list_ui_configs, get_ui_config, save_ui_config, delete_ui_config,
+       list_stacks, get_stack, save_stack, delete_stack,
        vck_status, vck_logout
 `);
 } else {
