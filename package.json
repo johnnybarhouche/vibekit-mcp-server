@@ -1,6 +1,6 @@
 {
   "name": "vibecoderskit-mcp-server",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "MCP server for VibeCodersKit - access your prompts, agents, skills, UI configs, tech stacks, and MCP configs from Claude Code",
   "type": "module",
   "main": "dist/index.js",
