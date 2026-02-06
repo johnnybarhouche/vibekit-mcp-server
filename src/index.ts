@@ -13,7 +13,7 @@ import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { readFileSync, existsSync, unlinkSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
 
@@ -60,17 +60,63 @@ function loadToken(): TokenData | null {
 }
 
 /**
- * Make authenticated API request
+ * Save updated token data to disk
+ */
+function saveToken(tokenData: TokenData): void {
+  if (!existsSync(CONFIG_DIR)) {
+    mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 });
+  }
+  writeFileSync(TOKEN_FILE, JSON.stringify(tokenData, null, 2), { mode: 0o600 });
+}
+
+/**
+ * Refresh an expired access token using the refresh token
+ */
+async function refreshAccessToken(token: TokenData): Promise<TokenData | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/mcp/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: token.refresh_token }),
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const updated: TokenData = {
+      ...token,
+      access_token: data.access_token,
+      expires_at: new Date(Date.now() + data.expires_in * 1000).toISOString(),
+    };
+
+    saveToken(updated);
+    return updated;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Make authenticated API request (auto-refreshes expired tokens)
  */
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = loadToken();
+  let token = loadToken();
   if (!token) {
     throw new Error(
       "Not authenticated. Run vck_login to connect your VibeCodersKit account."
     );
+  }
+
+  // Auto-refresh if token is expired (with 60s buffer)
+  const expiresAt = new Date(token.expires_at);
+  if (expiresAt.getTime() - Date.now() < 60_000) {
+    const refreshed = await refreshAccessToken(token);
+    if (refreshed) {
+      token = refreshed;
+    }
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -82,10 +128,31 @@ async function apiRequest<T>(
     },
   });
 
+  // If still 401 after potential refresh, try one more refresh
   if (response.status === 401) {
-    throw new Error(
-      "Authentication expired. Run vck_login to reconnect your account."
-    );
+    const refreshed = await refreshAccessToken(token);
+    if (!refreshed) {
+      throw new Error(
+        "Authentication expired. Run vck_login to reconnect your account."
+      );
+    }
+
+    // Retry the request with the new token
+    const retry = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${refreshed.access_token}`,
+        ...options.headers,
+      },
+    });
+
+    if (!retry.ok) {
+      const error = await retry.json().catch(() => ({}));
+      throw new Error(error.error || `API error: ${retry.status}`);
+    }
+
+    return retry.json();
   }
 
   if (!response.ok) {
@@ -539,13 +606,30 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
 });
 
 // Start server
-async function main() {
+async function startServer() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error("VibeCodersKit MCP server running");
 }
 
-main().catch((error) => {
-  console.error("Server error:", error);
-  process.exit(1);
-});
+// CLI subcommand routing
+const subcommand = process.argv[2];
+
+if (subcommand === "login") {
+  // Dynamically import login script
+  import("./login.js");
+} else if (subcommand === "help" || subcommand === "--help") {
+  console.log(`
+VibeCodersKit MCP Server
+
+Usage:
+  npx @vibekit/mcp-server          Start the MCP server (stdio)
+  npx @vibekit/mcp-server login    Connect your VibeCodersKit account
+  npx @vibekit/mcp-server help     Show this help message
+`);
+} else {
+  startServer().catch((error) => {
+    console.error("Server error:", error);
+    process.exit(1);
+  });
+}

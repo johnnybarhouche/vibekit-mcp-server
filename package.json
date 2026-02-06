@@ -5,8 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "vibekit-mcp": "./dist/index.js",
-    "vck_login": "./dist/login.js"
+    "vibekit-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
